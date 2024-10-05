@@ -1,14 +1,8 @@
-
-
 twig:
-    # Set the file name pattern for Twig files
     file_name_pattern: '*.twig'
     
-    # Default form themes
     form_themes: ['bootstrap_4_layout.html.twig']
     
-# Environment-specific configuration
 when@test:
     twig:
-        # Enable strict variables for Twig in the test environment
         strict_variables: true
