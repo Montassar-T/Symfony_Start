@@ -19,6 +19,14 @@ use App\Form\PropertySearchType;
 use App\Entity\CategorySearch;
 use App\Form\CategorySearchType;
 
+use App\Form\PriceSearchType;
+use App\Entity\PriceSearch; // Ajoutez cette ligne avec le bon namespace
+use Doctrine\Persistence\ManagerRegistry;
+
+
+
+
+
 class IndexController extends AbstractController
 {
 #[Route('/', name: 'app_home')]
@@ -143,7 +151,58 @@ public function home(EntityManagerInterface $entityManager, Request $request): R
                 'form' => $form->createView(),
             ]);
         }
+
+
+
+        #[Route('/art_cat/', name: 'article_par_cat', methods: ['GET', 'POST'])]
+        public function articlesParCategorie(Request $request, EntityManagerInterface $entityManager): Response
+        {
+            $categorySearch = new CategorySearch();
+            $form = $this->createForm(CategorySearchType::class, $categorySearch);
+            $form->handleRequest($request);
     
+            $articles = [];
+    
+            if ($form->isSubmitted() && $form->isValid()) {
+                $category = $categorySearch->getCategory();
+    
+                if ($category !="") {
+                    // Fetch articles associated with the selected category
+                    $articles = $category->getArticles();
+                } else {
+                    // Fetch all articles if no category is selected
+                    $articles = $entityManager->getRepository(Article::class)->findAll();
+                }
+            }
+    
+            return $this->render('articles/articlesParCategorie.html.twig', [
+                'form' => $form->createView(),
+                'articles' => $articles,
+            ]);
+        }
+
+        #[Route('/art_prix/', name: 'article_par_prix', methods: ['GET', 'POST'])]
+        public function articlesParPrix(Request $request, ManagerRegistry $doctrine)
+        {
+            $priceSearch = new PriceSearch();
+            $form = $this->createForm(PriceSearchType::class, $priceSearch);
+            $form->handleRequest($request);
+    
+            $articles = [];
+            if ($form->isSubmitted() && $form->isValid()) {
+                $minPrice = $priceSearch->getMinPrice();
+                $maxPrice = $priceSearch->getMaxPrice();
+    
+                $articles = $doctrine->getRepository(Article::class)
+                    ->findByPriceRange($minPrice, $maxPrice);
+            }
+    
+            return $this->render('articles/articlesParPrix.html.twig', [
+                'form' => $form->createView(),
+                'articles' => $articles,
+            ]);
+        }
+        
 
 }
 
