@@ -20,7 +20,7 @@ use App\Entity\CategorySearch;
 use App\Form\CategorySearchType;
 
 use App\Form\PriceSearchType;
-use App\Entity\PriceSearch; // Ajoutez cette ligne avec le bon namespace
+use App\Entity\PriceSearch;
 use Doctrine\Persistence\ManagerRegistry;
 
 
@@ -39,13 +39,11 @@ public function home(EntityManagerInterface $entityManager, Request $request): R
     $articles = $entityManager->getRepository(Article::class)->findAll();
 
     if ($form->isSubmitted() && $form->isValid()) {
-        $nom = $propertySearch->getNom(); // Get the search term
+        $nom = $propertySearch->getNom(); 
 
-        // If a name is provided, fetch articles with that name
         if (!empty($nom)) {
-            $articles = $entityManager->getRepository(Article::class)->findBy(['Nom' => $nom]); // Use 'Nom' here
+            $articles = $entityManager->getRepository(Article::class)->findBy(['Nom' => $nom]); 
         } else {
-            // If no name is provided, fetch all articles
             $articles = $entityManager->getRepository(Article::class)->findAll();
         }
     }
